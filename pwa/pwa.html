@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mercado Viva - Omnicanal</title>
+    <!-- Librería Open Source para leer QR -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        :root {
+            --bg: #1F5A44;
+            --surface: #FFFFFF;
+            --ink: #1C1E19;
+            --ink-soft: #5B5F54;
+            --line: #E4E6DD;
+            --brand: #1F5A44;
+            --brand-strong: #163E30;
+            --brand-soft: #E5EFE9;
+            --accent: #2F8F5B;
+            --accent-strong: #24714A;
+            --warn: #B5432E;
+            --warn-soft: #F7E7E3;
+            --pending-soft: #F4EFDD;
+            --pending: #8A7B3A;
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: var(--font);
+            /* FONDO DE SUPERMERCADO CON FILTRO VERDE CORPORATIVO */
+            background-image: linear-gradient(rgba(31, 90, 68, 0.85), rgba(31, 90, 68, 0.85)), url('https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--ink);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 24px;
+        }
+
+        .container {
+            background-color: var(--surface);
+            padding: 32px;
+            border-radius: var(--radius-md);
+            box-shadow: 0 20px 40px rgba(9, 20, 15, 0.28);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .brand-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .brand-mark {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--brand);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .brand-word {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--ink);
+        }
+
+        h2 {
+            margin: 0 0 4px 0;
+            color: var(--ink);
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        h2 svg { flex-shrink: 0; color: var(--brand); }
+
+        .view-sub {
+            color: var(--ink-soft);
+            font-size: 13px;
+            margin: 0 0 22px 0;
+            padding-bottom: 18px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .form-group { margin-bottom: 15px; }
+
+        label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: var(--ink-soft);
+        }
+
+        input[type="text"], input[type="password"], select {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-sm);
+            box-sizing: border-box;
+            font-size: 15px;
+            margin-bottom: 10px;
+            font-family: var(--font);
+            background: var(--surface);
+            color: var(--ink);
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(47, 143, 91, 0.15);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--brand);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.15s, transform 0.05s;
+            margin-bottom: 10px;
+            font-family: var(--font);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button:hover { background-color: var(--brand-strong); }
+        button:active { transform: translateY(1px); }
+
+        .btn-success { background-color: var(--accent); margin-top: 15px; }
+        .btn-success:hover { background-color: var(--accent-strong); }
+
+        .btn-dark {
+            background-color: var(--surface);
+            color: var(--ink);
+            border: 1px solid var(--line);
+        }
+        .btn-dark:hover { background-color: var(--brand-soft); border-color: var(--brand); }
+
+        .btn-danger { background-color: var(--warn); }
+        .btn-danger:hover { background-color: #8F331F; }
+
+        #vistaCajero, #vistaCliente, #orderDetails, #successMessage { display: none; }
+
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 4px;
+            border-bottom: 1px solid var(--line);
+            font-size: 14px;
+        }
+        .product-item:last-child { border-bottom: none; }
+        .product-item label { display: flex; align-items: center; gap: 10px; font-weight: 500; color: var(--ink); margin-bottom: 0; }
+        .product-item input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--accent); margin: 0; }
+        .product-item span { font-weight: 600; color: var(--ink); }
+
+        .success-box {
+            text-align: center;
+            margin-top: 6px;
+        }
+
+        .success-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: var(--brand-soft);
+            color: var(--brand-strong);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 4px auto 16px;
+        }
+
+        .success-box h3 {
+            margin: 0 0 8px 0;
+            font-size: 18px;
+        }
+
+        .success-box p {
+            margin: 4px 0;
+            color: var(--ink-soft);
+            font-size: 14px;
+        }
+
+        .error-text {
+            color: var(--warn);
+            font-size: 13px;
+            display: none;
+            margin-top: -4px;
+            margin-bottom: 10px;
+            text-align: left;
+            font-weight: 500;
+        }
+        .error-text svg { vertical-align: -3px; margin-right: 4px; }
+
+        .qr-box {
+            background: var(--surface);
+            padding: 22px 16px;
+            text-align: center;
+            border-radius: var(--radius-sm);
+            margin-top: 16px;
+            border: 1.5px dashed var(--brand);
+        }
+
+        .qr-box .code {
+            margin: 0;
+            font-weight: 700;
+            font-size: 22px;
+            color: var(--brand-strong);
+            letter-spacing: 0.02em;
+        }
+
+        .qr-box .hint {
+            margin: 8px 0 0 0;
+            font-size: 12px;
+            color: var(--ink-soft);
+        }
+
+        .order-summary {
+            background: var(--bg-alt, #F6F7F1);
+            background: #F6F7F1;
+            padding: 16px;
+            border-radius: var(--radius-sm);
+        }
+
+        .order-summary h3 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            color: var(--ink-soft);
+            font-weight: 600;
+        }
+
+        .order-summary .product-name {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .order-summary .product-total {
+            margin: 4px 0 0 0;
+            color: var(--accent-strong);
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        #reader {
+            width: 100%;
+            max-width: 400px;
+            display: none;
+            margin-bottom: 10px;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+        }
+
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235B5F54' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- MÓDULO 1: LOGIN -->
+<div class="container" id="vistaLogin">
+    <div class="brand-row">
+        <span class="brand-mark">V</span>
+        <span class="brand-word">Mercado VIVA</span>
+    </div>
+    <h2>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        Iniciar sesión
+    </h2>
+    <p class="view-sub">Simulador Mercado Viva</p>
+
+    <div class="form-group">
+        <label>Usuario</label>
+        <input type="text" id="username" placeholder="Ingresa tu usuario">
+    </div>
+    <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="password" placeholder="••••••">
+    </div>
+
+    <button onclick="iniciarSesion()">Ingresar al sistema</button>
+    <p id="loginError" class="error-text">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Usuario o contraseña incorrectos
+    </p>
+</div>
+
+<!-- MÓDULO 2: VISTA DEL CLIENTE -->
+<div class="container" id="vistaCliente">
+    <div class="brand-row">
+        <span class="brand-mark">V</span>
+        <span class="brand-word">Mercado VIVA</span>
+    </div>
+    <h2>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        Mi app
+    </h2>
+    <p class="view-sub">Bienvenido, <strong>Juan Pérez</strong></p>
+
+    <div class="order-summary">
+        <h3>Última compra (entregado)</h3>
+        <p class="product-name">Licuadora Oster + Set de Vasos</p>
+        <p class="product-total">Total: $180.000 COP</p>
+
+        <div class="qr-box">
+            <p class="code">PED-12345</p>
+            <p class="hint">Muestra este código al cajero para devoluciones</p>
+        </div>
+    </div>
+
+    <button class="btn-danger" style="margin-top: 20px;" onclick="cerrarSesion()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Cerrar sesión
+    </button>
+</div>
+
+<!-- MÓDULO 3: VISTA DEL CAJERO (POS) -->
+<div class="container" id="vistaCajero">
+    <div class="brand-row">
+        <span class="brand-mark">V</span>
+        <span class="brand-word">Mercado VIVA</span>
+    </div>
+    <h2>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        POS Mercado VIVA
+    </h2>
+    <p class="view-sub">Módulo de devoluciones — empleado</p>
+
+    <div class="form-group" id="searchSection">
+        <label for="orderId">Escanea o ingresa el código QR del cliente</label>
+        <div id="reader"></div>
+
+        <button id="btnEscanear" class="btn-dark" onclick="iniciarEscanner()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            Activar cámara
+        </button>
+        <input type="text" id="orderId" placeholder="Ej: PED-12345">
+        <button onclick="buscarPedido()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            Buscar pedido manualmente
+        </button>
+    </div>
+
+    <div id="orderDetails">
+        <h3 style="margin-top: 6px; margin-bottom: 12px; color: var(--brand); font-size: 15px;">Cliente: <span id="clienteNombre" style="color: var(--ink);"></span></h3>
+        <label>Selecciona los productos físicos a devolver</label>
+        <div id="productList"></div>
+
+        <div class="form-group" style="margin-top: 16px;">
+            <label for="motivoDevolucion">Motivo de devolución (obligatorio)</label>
+            <select id="motivoDevolucion" onchange="limpiarError()">
+                <option value="">-- Selecciona un motivo --</option>
+                <option value="buen_estado">Buen estado (suma al inventario)</option>
+                <option value="averiado">Averiado / dañado de fábrica</option>
+                <option value="talla_color">Error de talla o color</option>
+            </select>
+            <div id="errorMotivo" class="error-text">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                Debes seleccionar un motivo.
+            </div>
+        </div>
+
+        <button class="btn-success" onclick="aprobarDevolucion()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Aprobar devolución
+        </button>
+    </div>
+
+    <div id="successMessage" class="success-box">
+        <div class="success-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h3>Devolución exitosa</h3>
+        <p>Transacción ID: <strong>#<span id="transId"></span></strong></p>
+        <p>Se ha notificado al cliente y actualizado el inventario.</p>
+        <button style="margin-top: 14px; background-color: var(--ink-soft);" onclick="reiniciarCaja()">Atender a otro cliente</button>
+    </div>
+
+    <button class="btn-danger" style="margin-top: 20px;" onclick="cerrarSesion()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Cerrar turno (salir)
+    </button>
+</div>
+
+<!-- LÓGICA JAVASCRIPT -->
+<script>
+    function iniciarSesion() {
+        const user = document.getElementById('username').value.trim();
+        const pass = document.getElementById('password').value.trim();
+        const errorMsg = document.getElementById('loginError');
+
+        // Los usuarios de prueba siguen funcionando internamente: cajero1 / 123 y cliente1 / 123
+        if (user === 'cajero1' && pass === '123') {
+            document.getElementById('vistaLogin').style.display = 'none';
+            document.getElementById('vistaCajero').style.display = 'block';
+            errorMsg.style.display = 'none';
+        } else if (user === 'cliente1' && pass === '123') {
+            document.getElementById('vistaLogin').style.display = 'none';
+            document.getElementById('vistaCliente').style.display = 'block';
+            errorMsg.style.display = 'none';
+        } else {
+            errorMsg.style.display = 'block';
+        }
+    }
+
+    function cerrarSesion() {
+        document.getElementById('vistaCajero').style.display = 'none';
+        document.getElementById('vistaCliente').style.display = 'none';
+        document.getElementById('vistaLogin').style.display = 'block';
+
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
+        reiniciarCaja();
+    }
+
+    let html5QrcodeScanner = null;
+
+    function iniciarEscanner() {
+        const readerDiv = document.getElementById('reader');
+        const btnEscanear = document.getElementById('btnEscanear');
+        readerDiv.style.display = "block";
+        btnEscanear.style.display = "none";
+
+        html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
+        html5QrcodeScanner.render(
+            (decodedText) => {
+                html5QrcodeScanner.clear();
+                document.getElementById('reader').style.display = "none";
+                document.getElementById('btnEscanear').style.display = "block";
+                document.getElementById('orderId').value = decodedText;
+                buscarPedido();
+            },
+            (error) => { }
+        );
+    }
+
+    const mockDatabase = {
+        "PED-12345": {
+            cliente: "Juan Pérez",
+            estado: "Entregado",
+            productos: [
+                { id: 1, nombre: "Licuadora Oster", precio: 150000 },
+                { id: 2, nombre: "Set de Vasos", precio: 30000 }
+            ]
+        }
+    };
+
+    function buscarPedido() {
+        const id = document.getElementById('orderId').value.trim();
+        const pedido = mockDatabase[id];
+
+        if (pedido) {
+            if (pedido.estado === "Devuelto") {
+                alert("⛔ Fraude detectado: Este pedido ya fue devuelto anteriormente.");
+                return;
+            }
+
+            document.getElementById('clienteNombre').innerText = pedido.cliente;
+            const productList = document.getElementById('productList');
+            productList.innerHTML = '';
+
+            pedido.productos.forEach(prod => {
+                productList.innerHTML += `
+                    <div class="product-item">
+                        <label><input type="checkbox" checked value="${prod.precio}"> ${prod.nombre}</label>
+                        <span>$${prod.precio.toLocaleString('es-CO')}</span>
+                    </div>
+                `;
+            });
+
+            document.getElementById('searchSection').style.display = 'none';
+            document.getElementById('orderDetails').style.display = 'block';
+        } else {
+            alert("❌ Pedido no encontrado en la base de datos.");
+        }
+    }
+
+    function aprobarDevolucion() {
+        const motivo = document.getElementById('motivoDevolucion').value;
+        if (motivo === "") {
+            document.getElementById('errorMotivo').style.display = 'block';
+            return;
+        }
+        document.getElementById('transId').innerText = Math.floor(Math.random() * 1000000);
+        document.getElementById('orderDetails').style.display = 'none';
+        document.getElementById('successMessage').style.display = 'block';
+    }
+
+    function limpiarError() { document.getElementById('errorMotivo').style.display = 'none'; }
+
+    function reiniciarCaja() {
+        document.getElementById('orderId').value = '';
+        document.getElementById('motivoDevolucion').value = '';
+        document.getElementById('searchSection').style.display = 'block';
+        document.getElementById('orderDetails').style.display = 'none';
+        document.getElementById('successMessage').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>

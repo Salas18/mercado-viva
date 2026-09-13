@@ -416,23 +416,52 @@
     </button>
 </div>
 
-<!-- LÓGICA JAVASCRIPT -->
+
 <script>
-    function iniciarSesion() {
+    async function iniciarSesion() {
         const user = document.getElementById('username').value.trim();
         const pass = document.getElementById('password').value.trim();
         const errorMsg = document.getElementById('loginError');
 
-        // Los usuarios de prueba siguen funcionando internamente: cajero1 / 123 y cliente1 / 123
-        if (user === 'cajero1' && pass === '123') {
-            document.getElementById('vistaLogin').style.display = 'none';
-            document.getElementById('vistaCajero').style.display = 'block';
+        if (!user || !pass) {
+            errorMsg.innerText = "Por favor ingresa usuario y contraseña.";
+            errorMsg.style.display = 'block';
+            return;
+        }
+
+        try {
+
+            const response = await fetch("http://127.0.0.1:8000/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    username: user,
+                    password: pass
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                
+                errorMsg.innerText = "Usuario o contraseña incorrectos.";
+                errorMsg.style.display = 'block';
+                return;
+            }
+
             errorMsg.style.display = 'none';
-        } else if (user === 'cliente1' && pass === '123') {
-            document.getElementById('vistaLogin').style.display = 'none';
-            document.getElementById('vistaCliente').style.display = 'block';
-            errorMsg.style.display = 'none';
-        } else {
+
+            if (data.rol === 'cajero') {
+                document.getElementById('vistaLogin').style.display = 'none';
+                document.getElementById('vistaCajero').style.display = 'block';
+            } else if (data.rol === 'cliente') {
+                document.getElementById('vistaLogin').style.display = 'none';
+                document.getElementById('vistaCliente').style.display = 'block';
+            }
+
+        } catch (error) {
+            console.error(error);
+            errorMsg.innerText = "Error de conexión con el servidor.";
             errorMsg.style.display = 'block';
         }
     }
@@ -468,60 +497,96 @@
         );
     }
 
-    const mockDatabase = {
-        "PED-12345": {
-            cliente: "Juan Pérez",
-            estado: "Entregado",
-            productos: [
-                { id: 1, nombre: "Licuadora Oster", precio: 150000 },
-                { id: 2, nombre: "Set de Vasos", precio: 30000 }
-            ]
-        }
-    };
+    // BORRAMOS EL MOCKDATABASE, AHORA LEEMOS DATOS REALES DE LA NUBE
 
-    function buscarPedido() {
+    async function buscarPedido() {
         const id = document.getElementById('orderId').value.trim();
-        const pedido = mockDatabase[id];
+        if (!id) {
+            alert("Ingresa un código de pedido.");
+            return;
+        }
 
-        if (pedido) {
-            if (pedido.estado === "Devuelto") {
-                alert("⛔ Fraude detectado: Este pedido ya fue devuelto anteriormente.");
+        try {
+            // Conectamos con el backend de Python
+            const response = await fetch(`http://127.0.0.1:8000/pedidos/${id}`);
+            const data = await response.json();
+
+            // Si el backend nos lanza un error (ej. Fraude o No encontrado)
+            if (!response.ok) {
+                alert("❌ " + data.detail);
                 return;
             }
 
-            document.getElementById('clienteNombre').innerText = pedido.cliente;
+            // Si lo encuentra, pintamos los datos reales en pantalla
+            document.getElementById('clienteNombre').innerText = "Cliente ID: " + data.id_cliente;
+            
             const productList = document.getElementById('productList');
-            productList.innerHTML = '';
-
-            pedido.productos.forEach(prod => {
-                productList.innerHTML += `
-                    <div class="product-item">
-                        <label><input type="checkbox" checked value="${prod.precio}"> ${prod.nombre}</label>
-                        <span>$${prod.precio.toLocaleString('es-CO')}</span>
-                    </div>
-                `;
-            });
-
+            productList.innerHTML = `
+                <div class="product-item">
+                    <label><input type="checkbox" checked value="${data.monto_total}" id="montoDevolver"> Total de la compra</label>
+                    <span>$${data.monto_total.toLocaleString('es-CO')}</span>
+                </div>
+            `;
+            
             document.getElementById('searchSection').style.display = 'none';
             document.getElementById('orderDetails').style.display = 'block';
-        } else {
-            alert("❌ Pedido no encontrado en la base de datos.");
+
+        } catch (error) {
+            console.error(error);
+            alert("⚠️ Error: No se pudo conectar al servidor local.");
         }
     }
 
-    function aprobarDevolucion() {
+    async function aprobarDevolucion() {
         const motivo = document.getElementById('motivoDevolucion').value;
         if (motivo === "") {
             document.getElementById('errorMotivo').style.display = 'block';
             return;
         }
-        document.getElementById('transId').innerText = Math.floor(Math.random() * 1000000);
-        document.getElementById('orderDetails').style.display = 'none';
-        document.getElementById('successMessage').style.display = 'block';
+
+        const id = document.getElementById('orderId').value.trim();
+        const monto = parseFloat(document.getElementById('montoDevolver').value);
+        let pin = null;
+
+        // Validamos la regla de negocio del monto alto en el Front
+        if (monto >= 500000) {
+            pin = prompt("⚠️ AVISO DE SEGURIDAD: El monto supera los $500.000 COP.\nSolicite al supervisor que digite su PIN (ej. 7777):");
+            if (!pin) {
+                alert("Operación cancelada: Se requiere autorización del supervisor.");
+                return;
+            }
+        }
+
+        try {
+            // Enviamos la petición POST para actualizar la base de datos
+            const response = await fetch("http://127.0.0.1:8000/devoluciones", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    order_id: id,
+                    motivo: motivo,
+                    monto_devolucion: monto,
+                    pin_supervisor: pin
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                alert("❌ Error: " + data.detail);
+                return;
+            }
+
+            // Si el Backend aprueba todo, mostramos el éxito
+            document.getElementById('transId').innerText = Math.floor(Math.random() * 1000000);
+            document.getElementById('orderDetails').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'block';
+
+        } catch (error) {
+            console.error(error);
+            alert("⚠️ Error: No se pudo conectar al servidor local.");
+        }
     }
-
-    function limpiarError() { document.getElementById('errorMotivo').style.display = 'none'; }
-
     function reiniciarCaja() {
         document.getElementById('orderId').value = '';
         document.getElementById('motivoDevolucion').value = '';

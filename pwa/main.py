@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from supabase import create_client, Client
-
+from fastapi.middleware.cors import CORSMiddleware
 
 SUPABASE_URL = "https://grgiokbgquwxvavwcynu.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdyZ2lva2JncXV3eHZhdndjeW51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMjUyMjcsImV4cCI6MjEwNDkwMTIyN30.lBL4boniEtfN0ASyjVAmNFGrtxmXlliNPdKUrNQ0Srg" 
@@ -9,6 +9,13 @@ SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class DevolucionRequest(BaseModel):
     order_id: str
@@ -16,6 +23,30 @@ class DevolucionRequest(BaseModel):
     monto_devolucion: float
     pin_supervisor: str = None
 
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+@app.post("/login")
+def login(req: LoginRequest):
+    
+    response = supabase.table("usuarios").select("*").eq("username", req.username).execute()
+    
+    if not response.data:
+        raise HTTPException(status_code=401, detail="Usuario no encontrado")
+        
+    usuario = response.data[0]
+    
+    if usuario["password_hash"] != req.password:
+        raise HTTPException(status_code=401, detail="Contraseña incorrecta")
+        
+    token_jwt = f"jwt-token-valido-{usuario['id_usuario']}"
+    
+    return {
+        "status": "success",
+        "token": token_jwt,
+        "rol": usuario["rol"]
+    }
 @app.get("/pedidos/{order_id}")
 def buscar_pedido(order_id: str):
     response = supabase.table("pedidos").select("*").eq("id_pedido", order_id).execute()

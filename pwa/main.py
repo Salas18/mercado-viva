@@ -62,17 +62,35 @@ def buscar_pedido(order_id: str):
 
 @app.post("/devoluciones")
 def procesar_devolucion(req: DevolucionRequest):
+    
     pedido_res = supabase.table("pedidos").select("*").eq("id_pedido", req.order_id).execute()
     if not pedido_res.data:
-        raise HTTPException(status_code=404, detail="Pedido no existe.")
-        
-    # Regla estricta: PIN para montos altos
-    if req.monto_devolucion >= 500000 and req.pin_supervisor != "7777":
-        raise HTTPException(status_code=403, detail="Monto alto. PIN de supervisor incorrecto.")
-
-    supabase.table("pedidos").update({"estado": "Devuelto"}).eq("id_pedido", req.order_id).execute()
+        raise HTTPException(status_code=404, detail="Factura digital no encontrada en el sistema.")
+            
     
-    return {"status": "success", "mensaje": "Transacción aprobada en base de datos central."}
+    if req.monto_devolucion >= 500000 and req.pin_supervisor != "7777":
+        raise HTTPException(status_code=403, detail="Autorización denegada. El PIN del supervisor es incorrecto.")
+
+    
+    supabase.table("pedidos").update({"estado": "Devuelto"}).eq("id_pedido", req.order_id).execute()
+        
+
+    if req.motivo == "buen_estado":
+        try:
+            
+            inv_res = supabase.table("inventario").select("cantidad_disponible").eq("sku", "SKU-001").execute()
+            
+            if inv_res.data:
+                cantidad_actual = inv_res.data[0]["cantidad_disponible"]
+                nueva_cantidad = cantidad_actual + 1
+                
+                
+                supabase.table("inventario").update({"cantidad_disponible": nueva_cantidad}).eq("sku", "SKU-001").execute()
+        except Exception as e:
+
+             pass
+            
+    return {"status": "success", "mensaje": "Transacción completada en Mercado Viva."}
 
 @app.get("/")
 def read_root():

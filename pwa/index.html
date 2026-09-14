@@ -362,7 +362,7 @@
             
             const motorEscaner = new Html5Qrcode("reader");
             motorEscaner.start(
-    { facingMode: "user" }, 
+    { facingMode: "environment" }, 
     { fps: 10, qrbox: { width: 200 } },
     (decodedText) => {
         // Se ejecuta cuando lee el QR con éxito

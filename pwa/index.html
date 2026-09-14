@@ -217,6 +217,9 @@
                     
                     <button type="button" class="btn-3d z-3" onclick="buscarPedido()">Buscar Pedido</button>
                     <p id="searchError" class="error-text z-2" style="display: none; margin-top: 15px; background: rgba(255, 77, 77, 0.1); padding: 10px; border-radius: 8px; border: 1px dashed #ff4d4d;"></p>
+                    <button onclick="cerrarSesion()" style="margin-top: 15px; background-color: #3b2a3a; color: #ff6b6b; border: 1px solid #ff6b6b; padding: 12px; border-radius: 10px; width: 100%; font-weight: bold; cursor: pointer;">
+    CERRAR SESIÓN
+</button>
                 </div>
 
                 <div id="orderDetails" style="display: none;">
@@ -363,7 +366,7 @@
             const motorEscaner = new Html5Qrcode("reader");
             motorEscaner.start(
     { facingMode: "environment" }, 
-    { fps: 10, qrbox: { width: 200 } },
+    { fps: 10 },
     (decodedText) => {
         // Se ejecuta cuando lee el QR con éxito
         motorEscaner.stop().then(() => {

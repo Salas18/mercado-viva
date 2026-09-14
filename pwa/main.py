@@ -73,3 +73,10 @@ def procesar_devolucion(req: DevolucionRequest):
     supabase.table("pedidos").update({"estado": "Devuelto"}).eq("id_pedido", req.order_id).execute()
     
     return {"status": "success", "mensaje": "Transacción aprobada en base de datos central."}
+
+@app.get("/")
+def read_root():
+    return {
+        "sistema": "Mercado VIVA API",
+        "estado": "Activo y corriendo en tiempo real"
+    }

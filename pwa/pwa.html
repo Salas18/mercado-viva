@@ -319,7 +319,7 @@
     </p>
 </div>
 
-<!-- MÓDULO 2: VISTA DEL CLIENTE -->
+
 <div class="container" id="vistaCliente">
     <div class="brand-row">
         <span class="brand-mark">V</span>
@@ -329,8 +329,23 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
         Mi app
     </h2>
-    <p class="view-sub">Bienvenido, <strong>Juan Pérez</strong></p>
+    <p class="view-sub">Bienvenido, <strong>Miguel</strong></p>
 
+    <!-- FACTURA DIGITAL -->
+    <div id="misFacturas" style="background: white; padding: 20px; border-radius: 10px; color: black; max-width: 300px; margin: 20px auto; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+        <h3 style="color: #ff4d4d; margin-top: 0;">🛒 Factura Digital</h3>
+        <hr>
+        <p><strong>Pedido:</strong> PED-XBOX1</p>
+        <p><strong>Artículo:</strong> Mando Xbox Series X/S</p>
+        <p><strong>Total:</strong> $350.000 COP</p>
+        <p><strong>Fecha:</strong> 12 Septiembre 2026</p>
+        <hr>
+        <p style="font-size: 12px; color: gray;">Muestra este código al cajero para devoluciones físicas:</p>
+        
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=PED-XBOX1" alt="QR Factura" style="margin-top: 10px;">
+    </div>
+    
+    <!-- HISTORIAL DE COMPRAS -->
     <div class="order-summary">
         <h3>Última compra (entregado)</h3>
         <p class="product-name">Licuadora Oster + Set de Vasos</p>
@@ -347,7 +362,6 @@
         Cerrar sesión
     </button>
 </div>
-
 <!-- MÓDULO 3: VISTA DEL CAJERO (POS) -->
 <div class="container" id="vistaCajero">
     <div class="brand-row">
@@ -419,52 +433,67 @@
 
 <script>
     async function iniciarSesion() {
-        const user = document.getElementById('username').value.trim();
-        const pass = document.getElementById('password').value.trim();
-        const errorMsg = document.getElementById('loginError');
+    const user = document.getElementById('username').value.trim();
+    const pass = document.getElementById('password').value.trim();
+    const errorMsg = document.getElementById('loginError');
 
-        if (!user || !pass) {
-            errorMsg.innerText = "Por favor ingresa usuario y contraseña.";
+    if (!user || !pass) {
+        errorMsg.innerText = "Por favor ingresa usuario y contraseña.";
+        errorMsg.style.display = 'block';
+        return;
+    }
+
+    
+    const btn = document.querySelector("button[onclick='iniciarSesion()']");
+    btn.innerText = "Conectando al servidor...";
+    btn.disabled = true;
+
+    try {
+        const response = await fetch("http://127.0.0.1:8000/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                username: user,
+                password: pass
+            })
+        });
+
+        const data = await response.json();
+
+        
+        if (!response.ok) {
+            btn.innerText = "Ingresar al sistema";
+            btn.disabled = false;
+            
+            errorMsg.innerText = "Usuario o contraseña incorrectos.";
             errorMsg.style.display = 'block';
             return;
         }
 
-        try {
+        
+        btn.innerText = "Ingresar al sistema";
+        btn.disabled = false;
+        errorMsg.style.display = 'none';
 
-            const response = await fetch("http://127.0.0.1:8000/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    username: user,
-                    password: pass
-                })
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                
-                errorMsg.innerText = "Usuario o contraseña incorrectos.";
-                errorMsg.style.display = 'block';
-                return;
-            }
-
-            errorMsg.style.display = 'none';
-
-            if (data.rol === 'cajero') {
-                document.getElementById('vistaLogin').style.display = 'none';
-                document.getElementById('vistaCajero').style.display = 'block';
-            } else if (data.rol === 'cliente') {
-                document.getElementById('vistaLogin').style.display = 'none';
-                document.getElementById('vistaCliente').style.display = 'block';
-            }
-
-        } catch (error) {
-            console.error(error);
-            errorMsg.innerText = "Error de conexión con el servidor.";
-            errorMsg.style.display = 'block';
+        if (data.rol === 'cajero') {
+            document.getElementById('vistaLogin').style.display = 'none';
+            document.getElementById('vistaCajero').style.display = 'block';
+        } else if (data.rol === 'cliente') {
+            document.getElementById('vistaLogin').style.display = 'none';
+            document.getElementById('vistaCliente').style.display = 'block';
         }
+
+    } catch (error) {
+        console.error(error);
+        
+        
+        btn.innerText = "Ingresar al sistema";
+        btn.disabled = false;
+        
+        errorMsg.innerText = "Error de conexión con el servidor.";
+        errorMsg.style.display = 'block';
     }
+}
 
     function cerrarSesion() {
         document.getElementById('vistaCajero').style.display = 'none';

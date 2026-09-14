@@ -5,7 +5,12 @@
 Para entender cómo interactúan los componentes del MVP en tiempo real, desde el escaneo en la PWA hasta la validación en la base de datos, puedes consultar nuestro diagrama oficial:
 
  **[diagrama de arquitectura de software](https://app.eraser.io/workspace/PUJpmbxuyVwzQqDgqIMm?origin=share)**
+
+ 
  **[link de render para el front](https://mercado-viva-1.onrender.com/)**
+
+
+ 
  **[link del front para el back](https://mercado-viva-hfiu.onrender.com/)**
 
 ## Descripción del Proyecto

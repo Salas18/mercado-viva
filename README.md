@@ -24,7 +24,6 @@ El objetivo principal de este MVP es solucionar la desconexión logística entre
 ## Reglas de Negocio y Restricciones
 * **Validación de estado:** El producto debe cumplir con los criterios de buen estado para poder regresar al inventario físico.
 * **Bloqueo Antifraude:** La API verifica el estado de la compra en la nube para evitar que una misma factura sea devuelta dos veces.
-* **Seguridad de Montos:** Las devoluciones que superan los $500.000 COP exigen un PIN de autorización de un supervisor en tiempo real.
 * **Operación Continua:** El diseño respeta el presupuesto limitado utilizando los dispositivos actuales de la tienda sin interrumpir sus ventas diarias.
 
 ## Historias de Usuario Implementadas

@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mercado Viva | 3D Spatial UI</title>
+    
+    <!-- Lector QR e Iconos -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Fuente futurista -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #00F0FF; 
+            --secondary: #B026FF; 
+            --tertiary: #FF007F; 
+            /* Fondo más claro y premium (Azul Profundo en lugar de negro puro) */
+            --dark-bg: #0B1021; 
+            /* Cristal más brillante y claro */
+            --glass-bg: rgba(30, 40, 60, 0.45);
+            --font: 'Space Grotesk', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+
+        body {
+            font-family: var(--font);
+            color: white;
+            background: radial-gradient(circle at center, #1A233A 0%, var(--dark-bg) 100%);
+            overflow: hidden;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh;
+            perspective: 1200px;
+        }
+
+        /* ================= HOLOGRAMAS 3D CON COLORES REALES ================= */
+        .hologram-universe {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; transform-style: preserve-3d; pointer-events: none;
+        }
+
+        .holo-obj {
+            position: absolute; font-size: 80px;
+            opacity: 0; 
+            transform-style: preserve-3d;
+            transition: opacity 1.5s ease;
+            animation: floatHolo 25s infinite linear;
+            animation-delay: var(--d);
+            left: var(--x); top: var(--y);
+            /* Cada ícono tomará su propio color vibrante */
+            color: var(--icon-color);
+            filter: drop-shadow(0 0 15px var(--icon-color));
+        }
+
+        @keyframes floatHolo {
+            0% { transform: translateZ(var(--z)) rotateY(0deg) rotateX(0deg) translateY(0px); }
+            50% { transform: translateZ(calc(var(--z) + 150px)) rotateY(180deg) rotateX(30deg) translateY(-80px); }
+            100% { transform: translateZ(var(--z)) rotateY(360deg) rotateX(0deg) translateY(0px); }
+        }
+
+        .universe-login .obj-login { opacity: 0.6; }
+        .universe-cajero .obj-cajero { opacity: 0.6; }
+        .universe-cliente .obj-cliente { opacity: 0.6; }
+
+        /* ================= ESCENARIO PRINCIPAL 3D ================= */
+        .scene {
+            width: 100%; max-width: 520px; height: 720px;
+            perspective: 1500px; z-index: 10;
+        }
+
+        .hologram-panel {
+            width: 100%; height: 100%; position: relative;
+            transform-style: preserve-3d; transition: transform 0.1s ease-out;
+        }
+
+        .view {
+            position: absolute; width: 100%; height: 100%;
+            background: var(--glass-bg); backdrop-filter: blur(25px);
+            border: 1px solid rgba(255,255,255,0.2); border-radius: 35px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), inset 0 0 30px rgba(255, 255, 255, 0.1);
+            padding: 35px; display: flex; flex-direction: column; justify-content: center;
+            transform-style: preserve-3d; backface-visibility: hidden; 
+            transition: 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .view::before {
+            content: ''; position: absolute; top:0; left:0; width:100%; height:100%;
+            border-radius: 35px; pointer-events: none;
+            box-shadow: inset 0 0 20px var(--theme-color); opacity: 0.3;
+        }
+
+        .bg-img-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 35px; opacity: 0.2; z-index: -1;
+            transform: translateZ(-60px) scale(1.05);
+            background-size: cover; background-position: center;
+        }
+
+        /* Rotación de Vistas */
+        .view.hidden-right { transform: rotateY(180deg); pointer-events: none; opacity: 0; }
+        .view.hidden-left { transform: rotateY(-180deg); pointer-events: none; opacity: 0; }
+        .view.active { transform: rotateY(0deg); pointer-events: auto; opacity: 1; }
+
+        /* Capas de Profundidad */
+        .z-1 { transform: translateZ(40px); }
+        .z-2 { transform: translateZ(80px); }
+        .z-3 { transform: translateZ(120px); } 
+
+        /* ================= ELEMENTOS UI ================= */
+        h1, h2 { font-weight: 700; text-shadow: 0 0 10px rgba(255,255,255,0.3); margin-bottom: 10px; }
+        p.sub { font-size: 14px; color: #B0C4DE; margin-bottom: 25px; } /* Texto más claro */
+
+        .input-box { margin-bottom: 20px; position: relative; }
+        .input-box input, select {
+            width: 100%; padding: 16px 20px; background: rgba(0,0,0,0.4);
+            border: 2px solid rgba(255,255,255,0.2); border-radius: 16px;
+            color: white; font-family: var(--font); font-size: 16px; transition: 0.3s;
+        }
+        .input-box input:focus, select:focus { border-color: var(--theme-color); background: rgba(0,0,0,0.6); box-shadow: 0 0 20px rgba(255, 255, 255, 0.2); }
+        
+        .btn-3d {
+            width: 100%; padding: 16px; border: none; border-radius: 16px;
+            background: linear-gradient(45deg, rgba(255,255,255,0.2), var(--theme-color));
+            color: white; font-family: var(--font); font-size: 16px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 2px; cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.3);
+            transition: 0.3s;
+        }
+        .btn-3d:hover { transform: translateZ(100px) scale(1.05); box-shadow: 0 15px 30px rgba(0,0,0,0.5), 0 0 40px var(--theme-color); }
+
+        /* ================= VISTA CLIENTE ================= */
+        .level-bar {
+            width: 100%; height: 10px; background: rgba(255,255,255,0.2); border-radius: 10px;
+            margin-top: 10px; position: relative; overflow: hidden;
+        }
+        .level-bar::after {
+            content: ''; position: absolute; top:0; left:0; height:100%; width: 75%;
+            background: var(--tertiary); box-shadow: 0 0 15px var(--tertiary);
+        }
+
+        .daily-reward {
+            background: rgba(255,255,255,0.1); border: 1px dashed var(--tertiary);
+            border-radius: 20px; padding: 15px; text-align: center; cursor: pointer;
+            transition: 0.3s; position: relative; margin-bottom: 15px;
+        }
+        .daily-reward:hover { background: rgba(255,0,127,0.2); transform: translateZ(100px) scale(1.05); }
+        .orb {
+            width: 50px; height: 50px; margin: 0 auto 10px; border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #fff, var(--tertiary));
+            box-shadow: 0 0 20px var(--tertiary); animation: pulseOrb 2s infinite alternate;
+        }
+        @keyframes pulseOrb { 0% { transform: scale(1); } 100% { transform: scale(1.1); box-shadow: 0 0 40px var(--tertiary); } }
+
+        /* ================= CÁMARA REAL CAJERO ================= */
+        .camera-container {
+            background: rgba(0,0,0,0.5); border-radius: 16px; padding: 10px;
+            margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .scanner-hud {
+            height: 120px; border: 2px dashed var(--secondary); border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;
+        }
+        .laser-line { position: absolute; width: 100%; height: 3px; background: var(--secondary); box-shadow: 0 0 15px 5px var(--secondary); animation: scanLoop 1.5s infinite linear; }
+        @keyframes scanLoop { 0% { top: 0; opacity:0; } 10% { opacity:1; } 90% { opacity:1; } 100% { top: 100%; opacity:0; } }
+
+        /* Estilos para el lector QR de la librería */
+        #reader { width: 100%; border-radius: 12px; overflow: hidden; display: none; }
+        #reader button { background: var(--secondary); color: white; border: none; padding: 5px 10px; border-radius: 5px; margin: 5px; cursor: pointer;}
+        #reader a { color: var(--primary); }
+    </style>
+</head>
+<body>
+
+    <!-- ================= UNIVERSO HOLOGRÁFICO (COLORES VIBRANTES) ================= -->
+    <div class="hologram-universe universe-login" id="universe">
+        <!-- Supermercado & Electrodomésticos (LOGIN) -->
+        <div class="holo-obj obj-login" style="--icon-color: #34C759; --d: 0s; --x: 10vw; --y: 20vh; --z: -300px;"><i class="ph-duotone ph-shopping-cart"></i></div>
+        <div class="holo-obj obj-login" style="--icon-color: #5AC8FA; --d: -5s; --x: 80vw; --y: 60vh; --z: -400px;"><i class="ph-duotone ph-television"></i></div>
+        <div class="holo-obj obj-login" style="--icon-color: #FF3B30; --d: -10s; --x: 75vw; --y: 15vh; --z: -200px;"><i class="ph-duotone ph-apple-logo"></i></div>
+        <div class="holo-obj obj-login" style="--icon-color: #E0E0E0; --d: -15s; --x: 15vw; --y: 75vh; --z: -100px;"><i class="ph-duotone ph-washing-machine"></i></div>
+
+        <!-- Cosas de Cajero/POS (CAJERO) -->
+        <div class="holo-obj obj-cajero" style="--icon-color: #F8F8F8; --d: -2s; --x: 20vw; --y: 30vh; --z: -150px;"><i class="ph-duotone ph-receipt"></i></div>
+        <div class="holo-obj obj-cajero" style="--icon-color: #5856D6; --d: -7s; --x: 80vw; --y: 70vh; --z: -350px;"><i class="ph-duotone ph-credit-card"></i></div>
+        <div class="holo-obj obj-cajero" style="--icon-color: #00F0FF; --d: -12s; --x: 70vw; --y: 20vh; --z: -250px;"><i class="ph-duotone ph-barcode"></i></div>
+        <div class="holo-obj obj-cajero" style="--icon-color: #FF9500; --d: -4s; --x: 15vw; --y: 80vh; --z: -200px;"><i class="ph-duotone ph-calculator"></i></div>
+        
+        <!-- Gamificación/Premios (CLIENTE) -->
+        <div class="holo-obj obj-cliente" style="--icon-color: #FF2D55; --d: 0s; --x: 15vw; --y: 25vh; --z: -200px;"><i class="ph-duotone ph-gift"></i></div>
+        <div class="holo-obj obj-cliente" style="--icon-color: #FFD700; --d: -8s; --x: 85vw; --y: 65vh; --z: -300px;"><i class="ph-duotone ph-coin"></i></div>
+        <div class="holo-obj obj-cliente" style="--icon-color: #A2845E; --d: -14s; --x: 75vw; --y: 20vh; --z: -150px;"><i class="ph-duotone ph-tote"></i></div>
+        <div class="holo-obj obj-cliente" style="--icon-color: #FFD700; --d: -6s; --x: 20vw; --y: 75vh; --z: -400px;"><i class="ph-duotone ph-sparkle"></i></div>
+    </div>
+
+    <!-- ================= ESCENARIO PRINCIPAL (CÁMARA) ================= -->
+    <div class="scene">
+        <div class="hologram-panel" id="tiltPanel">
+            
+            <!-- ================= 1. VISTA LOGIN ================= -->
+            <div id="vistaLogin" class="view active" style="--theme-color: var(--primary);">
+                <div class="bg-img-layer" style="background-image: url('image_4278ac.png');"></div>
+                
+                <div class="z-2" style="text-align: center; margin-bottom: 15px;">
+                    <i class="ph-duotone ph-storefront" style="font-size: 70px; color: var(--primary);"></i>
+                </div>
+                
+                <div class="z-3" style="text-align: center;">
+                    <h1 style="color: var(--primary);">MERCADO VIVA</h1>
+                    <p class="sub">Plataforma Inmersiva 3D</p>
+                </div>
+
+                <div class="z-2 input-box">
+                    <input type="text" id="username" placeholder="Usuario (cliente1 / cajero1)">
+                </div>
+                
+                <div class="z-2 input-box">
+                    <input type="password" id="password" placeholder="Contraseña (123)">
+                </div>
+                
+                <p id="loginError" style="color: #ff4d4d; font-size: 13px; display: none; text-align:center; font-weight:bold;">Acceso denegado.</p>
+
+                <button class="btn-3d z-3" onclick="procesarLogin()">Entrar al Sistema <i class="ph-bold ph-arrow-right"></i></button>
+            </div>
+
+            <!-- ================= 2. VISTA CLIENTE ================= -->
+            <div id="vistaCliente" class="view hidden-right" style="--theme-color: var(--tertiary);">
+                <div class="bg-img-layer" style="background-image: url('image_4278ac.png');"></div>
+                
+                <div class="z-3" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div>
+                        <h2 style="color: white; font-size: 26px;">Hola, Juan</h2>
+                        <p style="font-size: 12px; color: #E0E0E0;">Nivel 42 - Comprador Élite</p>
+                        <div class="level-bar"></div>
+                    </div>
+                    <i class="ph-fill ph-seal-check" style="font-size: 45px; color: var(--tertiary);"></i>
+                </div>
+
+                <div class="daily-reward z-3" onclick="reclamarPremio(this)">
+                    <div class="orb"></div>
+                    <h3 style="font-size: 16px; color: white;">Toca para revelar premio</h3>
+                    <p style="font-size: 12px; color: #E0E0E0;">Recompensa Diaria Disponible</p>
+                </div>
+
+                <div class="z-2" style="background: rgba(0,0,0,0.6); padding: 20px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.2);">
+                    <p style="font-size: 13px; color: #E0E0E0; margin-bottom: 5px;">Muestra este QR en caja</p>
+                    <i class="ph-duotone ph-qr-code" style="font-size: 80px; color: white;"></i>
+                    <p style="color: var(--tertiary); font-weight: 700; font-size: 20px; letter-spacing: 2px;">PED-12345</p>
+                </div>
+
+                <button class="btn-3d z-1" style="background: rgba(255,77,77,0.2); border-color: #ff4d4d; color: #ff4d4d; margin-top: 15px; box-shadow:none;" onclick="cerrarSesion()">Cerrar Sesión</button>
+            </div>
+
+            <!-- ================= 3. VISTA CAJERO (POS) CON CÁMARA ================= -->
+            <div id="vistaCajero" class="view hidden-left" style="--theme-color: var(--secondary);">
+                <div class="bg-img-layer" style="background-image: url('image_427bf2.jpg'); opacity: 0.3;"></div>
+                
+                <h2 class="z-3" style="color: white; font-size: 26px;">Caja Principal <i class="ph-duotone ph-desktop" style="vertical-align: middle; color: var(--secondary);"></i></h2>
+                <p class="sub z-2" style="margin-bottom: 15px;">Módulo Omnicanal de Devoluciones</p>
+
+                <div id="searchSection">
+                    
+                    <!-- CONTENEDOR DE LA CÁMARA -->
+                    <div class="camera-container z-2">
+                        <!-- Aquí se inyecta la cámara real -->
+                        <div id="reader"></div>
+                        
+                        <!-- Animación Falsa (Se oculta al prender cámara) -->
+                        <div class="scanner-hud" id="mockScanner">
+                            <div class="laser-line"></div>
+                            <i class="ph-duotone ph-barcode" style="font-size: 60px; color: rgba(255,255,255,0.5);"></i>
+                        </div>
+                        
+                        <!-- Botón para encender cámara web/celular -->
+                        <button class="btn-3d" id="btnActivarCamara" onclick="encenderCamara()" style="margin-top: 10px; padding: 12px; font-size: 14px; background: rgba(176, 38, 255, 0.3);">
+                            <i class="ph-bold ph-camera"></i> Activar Cámara Real
+                        </button>
+                    </div>
+
+                    <div class="input-box z-3" style="margin-bottom: 15px;">
+                        <input type="text" id="orderId" placeholder="O escribe el código aquí...">
+                    </div>
+                    
+                    <button class="btn-3d z-3" onclick="buscarPedido()">Buscar Factura</button>
+                </div>
+
+                <div id="orderDetails" style="display: none;">
+                    <div class="z-2" style="background: rgba(176, 38, 255, 0.2); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 4px solid var(--secondary);">
+                        <p style="font-size: 12px; color: var(--secondary); font-weight:bold;">CLIENTE ENCONTRADO</p>
+                        <h3 id="clienteNombre" style="font-size: 20px; color: white;"></h3>
+                    </div>
+
+                    <div id="productList" class="z-2" style="margin-bottom: 15px;"></div>
+
+                    <select id="motivoDevolucion" class="z-3">
+                        <option value="">¿Motivo de la Devolución?</option>
+                        <option value="1">Producto en buen estado (Cambio)</option>
+                        <option value="2">Garantía (Producto dañado)</option>
+                    </select>
+
+                    <button class="btn-3d z-3" onclick="procesar()">Confirmar Devolución</button>
+                </div>
+
+                <div id="successMessage" style="display: none; text-align: center;">
+                    <i class="ph-fill ph-check-circle z-3" style="font-size: 90px; color: #00FF88; text-shadow: 0 0 30px #00FF88; margin-bottom: 10px;"></i>
+                    <h2 class="z-2" style="color: white;">¡Completado!</h2>
+                    <p class="z-2" style="color: #E0E0E0; margin-bottom: 30px;">El inventario se ha actualizado correctamente.</p>
+                    
+                    <button class="btn-3d z-3" onclick="reiniciar()">Atender al Siguiente</button>
+                </div>
+
+                <button class="btn-3d z-1" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); color: white; margin-top: 10px; box-shadow:none;" onclick="cerrarSesion()">Cerrar Caja</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ================= LÓGICA JAVASCRIPT ================= -->
+    <script>
+        // EFECTO PARALLAX 3D (Se pausa si la cámara está activa para no marear)
+        const panel = document.getElementById('tiltPanel');
+        let parallaxActivo = true;
+
+        document.body.addEventListener('mousemove', (e) => {
+            if(!parallaxActivo) return;
+            let xAxis = (window.innerWidth / 2 - e.pageX) / 30; 
+            let yAxis = (window.innerHeight / 2 - e.pageY) / 30;
+            panel.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+        });
+        document.body.addEventListener('mouseleave', () => {
+            if(parallaxActivo) panel.style.transform = `rotateY(0deg) rotateX(0deg)`;
+        });
+
+        // CONTROL DE VISTAS 3D
+        function cambiarVista3D(vistaActual, vistaNueva, direccion, claseUniverso) {
+            document.getElementById('universe').className = `hologram-universe ${claseUniverso}`;
+            const actual = document.getElementById(vistaActual);
+            const nueva = document.getElementById(vistaNueva);
+            
+            actual.classList.remove('active');
+            actual.classList.add(direccion === 'derecha' ? 'hidden-left' : 'hidden-right');
+            
+            nueva.classList.remove('hidden-right', 'hidden-left');
+            nueva.classList.add('active');
+        }
+
+        function procesarLogin() {
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value.trim();
+            const error = document.getElementById('loginError');
+
+            if (pass === '123') {
+                error.style.display = 'none';
+                if (user === 'cliente1') {
+                    cambiarVista3D('vistaLogin', 'vistaCliente', 'derecha', 'universe-cliente');
+                } else if (user === 'cajero1') {
+                    cambiarVista3D('vistaLogin', 'vistaCajero', 'izquierda', 'universe-cajero');
+                } else {
+                    error.style.display = 'block';
+                }
+            } else {
+                error.style.display = 'block';
+            }
+        }
+
+        function cerrarSesion() {
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            reiniciar();
+            
+            if(document.getElementById('vistaCliente').classList.contains('active')) {
+                cambiarVista3D('vistaCliente', 'vistaLogin', 'izquierda', 'universe-login');
+            } else {
+                cambiarVista3D('vistaCajero', 'vistaLogin', 'derecha', 'universe-login');
+            }
+        }
+
+        // ESFERA DE PREMIO CLIENTE
+        function reclamarPremio(elemento) {
+            elemento.innerHTML = `
+                <i class="ph-fill ph-confetti" style="font-size: 50px; color: #FFD700;"></i>
+                <h3 style="font-size: 20px; color: white; margin-top:10px;">¡Ganaste 500 Puntos!</h3>
+                <p style="font-size: 12px; color: #E0E0E0;">Disfrútalos en tu próxima compra</p>
+            `;
+            elemento.style.background = 'var(--tertiary)';
+            elemento.style.pointerEvents = 'none';
+        }
+
+        // ================= INTEGRACIÓN DE CÁMARA REAL =================
+        let html5QrcodeScanner = null;
+
+        function encenderCamara() {
+            // Ocultar animación falsa y botón
+            document.getElementById('mockScanner').style.display = 'none';
+            document.getElementById('btnActivarCamara').style.display = 'none';
+            // Mostrar contenedor real
+            document.getElementById('reader').style.display = 'block';
+            
+            // Congelar el 3D para que sea fácil escanear
+            parallaxActivo = false;
+            panel.style.transform = `rotateY(0deg) rotateX(0deg)`;
+
+            // Iniciar librería
+            html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 200, height: 200} }, false);
+            html5QrcodeScanner.render(
+                (decodedText) => {
+                    // Éxito al escanear
+                    apagarCamara();
+                    document.getElementById('orderId').value = decodedText;
+                    buscarPedido();
+                },
+                (error) => { /* ignorar errores continuos de lectura */ }
+            );
+        }
+
+        function apagarCamara() {
+            if(html5QrcodeScanner) {
+                html5QrcodeScanner.clear();
+            }
+            document.getElementById('reader').style.display = 'none';
+            document.getElementById('mockScanner').style.display = 'flex';
+            document.getElementById('btnActivarCamara').style.display = 'block';
+            parallaxActivo = true; // Reactivar 3D
+        }
+
+        // BASE DE DATOS Y LÓGICA DE CAJERO
+        const db = {
+            "PED-12345": { cliente: "Juan Pérez", productos: [{ nom: "Licuadora Inteligente", p: 450000 }, { nom: "Set Vasos x4", p: 35000 }] }
+        };
+
+        function buscarPedido() {
+            const id = document.getElementById('orderId').value.trim();
+            if (db[id]) {
+                apagarCamara(); // Por si estaba encendida
+                document.getElementById('clienteNombre').innerText = db[id].cliente;
+                const lista = document.getElementById('productList');
+                lista.innerHTML = '';
+                db[id].productos.forEach(prod => {
+                    lista.innerHTML += `
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px; background: rgba(0,0,0,0.6); padding: 12px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                            <span style="font-weight: 500; color: white;">${prod.nom}</span>
+                            <span style="color: var(--primary); font-weight: 700;">$${prod.p.toLocaleString()}</span>
+                        </div>
+                    `;
+                });
+                document.getElementById('searchSection').style.display = 'none';
+                document.getElementById('orderDetails').style.display = 'block';
+            } else {
+                alert("Código no encontrado. Intenta con PED-12345");
+            }
+        }
+
+        function procesar() {
+            if (document.getElementById('motivoDevolucion').value === "") {
+                alert("Por favor selecciona un motivo.");
+                return;
+            }
+            document.getElementById('orderDetails').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'block';
+        }
+
+        function reiniciar() {
+            apagarCamara();
+            document.getElementById('orderId').value = '';
+            document.getElementById('motivoDevolucion').value = '';
+            document.getElementById('searchSection').style.display = 'block';
+            document.getElementById('orderDetails').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+            
+            // Restaurar premio si se reclama
+            const premio = document.querySelector('.daily-reward');
+            if(premio) {
+                premio.innerHTML = '<div class="orb"></div><h3 style="font-size: 16px; color: white;">Toca para revelar premio</h3><p style="font-size: 12px; color: #E0E0E0;">Recompensa Diaria Disponible</p>';
+                premio.style.background = 'rgba(255,255,255,0.1)';
+                premio.style.pointerEvents = 'auto';
+            }
+        }
+    </script>
+</body>
+</html>

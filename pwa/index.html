@@ -359,19 +359,25 @@
             parallaxActivo = false;
             panel.style.transform = `rotateY(0deg) rotateX(0deg)`;
 
-            html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
-    fps: 10, 
-    qrbox: { width: 200 },
-    videoConstraints: { facingMode: "user" } 
-}, false);
-            html5QrcodeScanner.render(
-                (decodedText) => {
-                    apagarCamara();
-                    document.getElementById('orderId').value = decodedText;
-                    buscarPedido();
-                },
-                (error) => {}
-            );
+            
+            const motorEscaner = new Html5Qrcode("reader");
+            motorEscaner.start(
+    { facingMode: "user" }, 
+    { fps: 10, qrbox: { width: 200 } },
+    (decodedText) => {
+        // Se ejecuta cuando lee el QR con éxito
+        motorEscaner.stop().then(() => {
+            document.getElementById('reader').style.display = "none";
+            document.getElementById('orderId').value = decodedText;
+            buscarPedido();
+        }).catch(err => console.log("Error apagando", err));
+    },
+    (error) => {
+        
+    }
+).catch((err) => {
+    console.error("No se pudo iniciar la cámara", err);
+});
         }
 
         function apagarCamara() {

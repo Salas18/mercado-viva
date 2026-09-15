@@ -1,4 +1,5 @@
-"<!DOCTYPE html>
+
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -123,6 +124,32 @@
         @keyframes scanLoop { 0% { top: 0; opacity:0; } 10% { opacity:1; } 90% { opacity:1; } 100% { top: 100%; opacity:0; } }
         #reader { width: 100%; border-radius: 12px; overflow: hidden; display: none; }
         #reader button { background: var(--secondary); color: white; border: none; padding: 5px 10px; border-radius: 5px; margin: 5px; cursor: pointer;}
+
+        /* Estilos del menú de perfil (vista cliente) */
+        .profile-btn {
+            width: 46px; height: 46px; border-radius: 50%;
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.2s;
+        }
+        .profile-btn:hover { background: rgba(255,255,255,0.18); border-color: var(--tertiary); }
+
+        .profile-menu {
+            display: none; position: absolute; top: 56px; right: 0; width: 230px;
+            background: rgba(15, 20, 38, 0.98); backdrop-filter: blur(14px);
+            border: 1px solid rgba(255,255,255,0.15); border-radius: 14px;
+            padding: 8px; box-shadow: 0 15px 40px rgba(0,0,0,0.55); z-index: 50;
+        }
+
+        .profile-menu-item {
+            width: 100%; text-align: left; background: none; border: none;
+            color: white; font-size: 13px; padding: 11px 12px; border-radius: 9px;
+            cursor: pointer; display: flex; align-items: center; gap: 10px;
+            font-family: var(--font); transition: 0.15s;
+        }
+        .profile-menu-item:hover { background: rgba(255,255,255,0.08); }
+        .profile-menu-item.danger { color: #ff8080; }
+        .profile-menu-item.danger:hover { background: rgba(255,77,77,0.12); }
     </style>
 </head>
 <body>
@@ -170,15 +197,44 @@
 
             <!-- ================= VISTA CLIENTE ================= -->
             <div id="vistaCliente" class="view hidden-right" style="--theme-color: var(--tertiary); position: relative; overflow: hidden;">
-                <div class="z-3" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <div>
-                        <h2 style="color: white; font-size: 22px;">Hola, Miguel</h2>
-                        <p style="font-size: 13px; color: var(--tertiary); font-weight: bold;">Mis Compras <i class="ph-bold ph-bag"></i></p>
+
+                <!-- Barra superior tipo Mercado Libre: logo + botón de perfil -->
+                <div class="z-3" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; position: relative;">
+                    <i class="ph-duotone ph-storefront" style="font-size: 32px; color: var(--tertiary);"></i>
+
+                    <div style="position: relative;">
+                        <button type="button" class="profile-btn" onclick="toggleMenuPerfil(event)">
+                            <i class="ph-fill ph-user-circle" style="font-size: 26px; color: var(--tertiary);"></i>
+                        </button>
+
+                        <div id="menuPerfil" class="profile-menu">
+                            <div style="padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 6px;">
+                                <p style="font-size: 14px; font-weight: 700; color: white; margin: 0;">Miguel</p>
+                                <p style="font-size: 11px; color: #B0C4DE; margin: 2px 0 0;">Cliente Autorizado</p>
+                            </div>
+                            <button type="button" class="profile-menu-item" onclick="mostrarMisCompras()">
+                                <i class="ph-bold ph-bag" style="color: var(--tertiary);"></i> Mis compras
+                            </button>
+                            <button type="button" class="profile-menu-item danger" onclick="cerrarSesion()">
+                                <i class="ph-bold ph-sign-out"></i> Cerrar sesión
+                            </button>
+                        </div>
                     </div>
-                    <i class="ph-fill ph-seal-check" style="font-size: 40px; color: var(--tertiary);"></i>
                 </div>
-                
-                <div class="z-2" style="overflow-y: auto; flex-grow: 1; padding-right: 5px; margin-bottom: 15px;">
+
+                <!-- Pantalla de bienvenida (por defecto, antes de abrir Mis compras) -->
+                <div id="clienteHome" class="z-2" style="text-align: center; padding: 50px 10px;">
+                    <i class="ph-duotone ph-seal-check" style="font-size: 60px; color: var(--tertiary);"></i>
+                    <h2 style="color: white; font-size: 20px; margin-top: 14px;">Hola, Miguel</h2>
+                    <p class="sub" style="margin-top: 6px;">Toca tu perfil arriba para ver tus compras</p>
+                </div>
+
+                <!-- Sección Mis compras (oculta hasta que se abre desde el menú) -->
+                <div id="misComprasSection" class="z-2" style="display: none; overflow-y: auto; flex-grow: 1; padding-right: 5px; margin-bottom: 15px;">
+                    <button type="button" onclick="ocultarMisCompras()" style="background: none; border: none; color: var(--tertiary); font-size: 13px; font-weight: 700; margin-bottom: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 0; font-family: var(--font);">
+                        <i class="ph-bold ph-arrow-left"></i> Mis compras
+                    </button>
+
                     <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.3s;" 
                          onclick="mostrarQR('PED-XBOX2', 'Mando Xbox Series X/S', '350.000')" onmouseover="this.style.borderColor='var(--tertiary)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
@@ -213,8 +269,6 @@
                         </div>
                     </div>
                 </div>
-
-                <button type="button" class="btn-3d z-1" style="background: rgba(255,77,77,0.2); border-color: #ff4d4d; color: #ff4d4d; box-shadow:none; margin-top: auto;" onclick="cerrarSesion()">Cerrar Sesión</button>
 
                 <div id="modalQR" class="z-3" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 16, 33, 0.95); backdrop-filter: blur(10px); flex-direction: column; justify-content: center; align-items: center; padding: 20px; border-radius: 35px; z-index: 100;">
                     <div style="background: white; padding: 20px; border-radius: 16px; text-align: center; color: black; width: 100%; max-width: 280px; box-shadow: 0 0 40px var(--tertiary);">
@@ -365,6 +419,7 @@
                 if (data.rol === 'cajero') {
                     cambiarVista3D('vistaLogin', 'vistaCajero', 'izquierda', 'universe-cajero');
                 } else if (data.rol === 'cliente') {
+                    ocultarMisCompras();
                     cambiarVista3D('vistaLogin', 'vistaCliente', 'derecha', 'universe-cliente');
                 }
 
@@ -381,6 +436,8 @@
             document.getElementById('username').value = '';
             document.getElementById('password').value = '';
             reiniciarCaja();
+            cerrarMenuPerfil();
+            ocultarMisCompras();
             
             if(document.getElementById('vistaCliente').classList.contains('active')) {
                 cambiarVista3D('vistaCliente', 'vistaLogin', 'izquierda', 'universe-login');
@@ -573,6 +630,37 @@ function ocultarQR() {
     // Oculta el panel superpuesto para volver a la lista
     document.getElementById('modalQR').style.display = 'none';
 }
+
+/* ---------- Menú de perfil (vista cliente) ---------- */
+
+function toggleMenuPerfil(event) {
+    if (event) event.stopPropagation();
+    const menu = document.getElementById('menuPerfil');
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+}
+
+function cerrarMenuPerfil() {
+    document.getElementById('menuPerfil').style.display = 'none';
+}
+
+function mostrarMisCompras() {
+    cerrarMenuPerfil();
+    document.getElementById('clienteHome').style.display = 'none';
+    document.getElementById('misComprasSection').style.display = 'block';
+}
+
+function ocultarMisCompras() {
+    document.getElementById('misComprasSection').style.display = 'none';
+    document.getElementById('clienteHome').style.display = 'block';
+}
+
+// Cierra el menú de perfil si el usuario hace clic afuera de él
+document.addEventListener('click', (e) => {
+    const menu = document.getElementById('menuPerfil');
+    if (menu && menu.style.display === 'block' && !menu.contains(e.target)) {
+        cerrarMenuPerfil();
+    }
+});
     </script>
 </body>
 </html>

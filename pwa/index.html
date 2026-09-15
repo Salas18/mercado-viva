@@ -144,7 +144,7 @@
     <div class="scene">
         <div class="hologram-panel" id="tiltPanel">
             
-            
+            <!-- ================= VISTA LOGIN ================= -->
             <div id="vistaLogin" class="view active" style="--theme-color: var(--primary);">
                 <div class="z-2" style="text-align: center; margin-bottom: 10px;">
                     <i class="ph-duotone ph-storefront" style="font-size: 60px; color: var(--primary);"></i>
@@ -168,88 +168,70 @@
                 <button type="button" class="btn-3d z-3" onclick="iniciarSesion()">Entrar al Sistema <i class="ph-bold ph-arrow-right"></i></button>
             </div>
 
-            
-            <!-- ================= VISTA CLIENTE (MIS COMPRAS) ================= -->
-<div id="vistaCliente" class="view hidden-right" style="--theme-color: var(--tertiary); position: relative; overflow: hidden;">
-    
-    <!-- Encabezado Perfil -->
-    <div class="z-3" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-        <div>
-            <h2 style="color: white; font-size: 22px;">Hola, Miguel</h2>
-            <p style="font-size: 13px; color: var(--tertiary); font-weight: bold;">Mis Compras <i class="ph-bold ph-bag"></i></p>
-        </div>
-        <i class="ph-fill ph-seal-check" style="font-size: 40px; color: var(--tertiary);"></i>
-    </div>
-
-    <!-- Contenedor de Lista de Compras (Scrolleable) -->
-    <div class="z-2" style="overflow-y: auto; flex-grow: 1; padding-right: 5px; margin-bottom: 15px;">
-        
-        <!-- Tarjeta de Producto 1 -->
-        <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.3s;" 
-             onclick="mostrarQR('PED-XBOX2', 'Mando Xbox Series X/S', '350.000')" 
-             onmouseover="this.style.borderColor='var(--tertiary)'" 
-             onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <span style="color: #00FF88; font-size: 11px; font-weight: bold;"><i class="ph-fill ph-check-circle"></i> Entregado hoy</span>
-                <span style="color: gray; font-size: 11px;">PED-XBOX2</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px;">
-                    <i class="ph-duotone ph-game-controller" style="font-size: 24px; color: white;"></i>
+            <!-- ================= VISTA CLIENTE ================= -->
+            <div id="vistaCliente" class="view hidden-right" style="--theme-color: var(--tertiary); position: relative; overflow: hidden;">
+                <div class="z-3" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div>
+                        <h2 style="color: white; font-size: 22px;">Hola, Miguel</h2>
+                        <p style="font-size: 13px; color: var(--tertiary); font-weight: bold;">Mis Compras <i class="ph-bold ph-bag"></i></p>
+                    </div>
+                    <i class="ph-fill ph-seal-check" style="font-size: 40px; color: var(--tertiary);"></i>
                 </div>
-                <div>
-                    <p style="font-size: 14px; font-weight: bold; margin: 0;">Mando Xbox Series X/S</p>
-                    <p style="font-size: 12px; color: #E0E0E0; margin: 0;">$350.000 COP</p>
+                
+                <div class="z-2" style="overflow-y: auto; flex-grow: 1; padding-right: 5px; margin-bottom: 15px;">
+                    <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.3s;" 
+                         onclick="mostrarQR('PED-XBOX2', 'Mando Xbox Series X/S', '350.000')" onmouseover="this.style.borderColor='var(--tertiary)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="color: #00FF88; font-size: 11px; font-weight: bold;"><i class="ph-fill ph-check-circle"></i> Entregado hoy</span>
+                            <span style="color: gray; font-size: 11px;">PED-XBOX2</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px;">
+                                <i class="ph-duotone ph-game-controller" style="font-size: 24px; color: white;"></i>
+                            </div>
+                            <div>
+                                <p style="font-size: 14px; font-weight: bold; margin: 0;">Mando Xbox Series X/S</p>
+                                <p style="font-size: 12px; color: #E0E0E0; margin: 0;">$350.000 COP</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.3s;" 
+                         onclick="mostrarQR('PED-AUD1', 'Audífonos Sony WH-1000XM5', '1.200.000')" onmouseover="this.style.borderColor='var(--tertiary)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="color: #00FF88; font-size: 11px; font-weight: bold;"><i class="ph-fill ph-check-circle"></i> Entregado el 10 Sep</span>
+                            <span style="color: gray; font-size: 11px;">PED-AUD1</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px;">
+                                <i class="ph-duotone ph-headphones" style="font-size: 24px; color: white;"></i>
+                            </div>
+                            <div>
+                                <p style="font-size: 14px; font-weight: bold; margin: 0;">Audífonos Sony WH-1000XM5</p>
+                                <p style="font-size: 12px; color: #E0E0E0; margin: 0;">$1.200.000 COP</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" class="btn-3d z-1" style="background: rgba(255,77,77,0.2); border-color: #ff4d4d; color: #ff4d4d; box-shadow:none; margin-top: auto;" onclick="cerrarSesion()">Cerrar Sesión</button>
+
+                <div id="modalQR" class="z-3" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 16, 33, 0.95); backdrop-filter: blur(10px); flex-direction: column; justify-content: center; align-items: center; padding: 20px; border-radius: 35px; z-index: 100;">
+                    <div style="background: white; padding: 20px; border-radius: 16px; text-align: center; color: black; width: 100%; max-width: 280px; box-shadow: 0 0 40px var(--tertiary);">
+                        <h3 style="color: var(--tertiary); font-size: 16px; margin-top: 0; margin-bottom: 5px;">🛒 Factura de Devolución</h3>
+                        <hr style="border: 0; border-top: 1px solid #eee; margin: 10px 0;">
+                        <p style="font-size: 13px; margin: 3px 0;" id="modalPedido"><strong>Pedido:</strong> -</p>
+                        <p style="font-size: 13px; margin: 3px 0;" id="modalArticulo"><strong>Artículo:</strong> -</p>
+                        <p style="font-size: 13px; margin: 3px 0;" id="modalTotal"><strong>Total:</strong> -</p>
+                        <hr style="border: 0; border-top: 1px solid #eee; margin: 10px 0;">
+                        <p style="font-size: 11px; color: gray; margin-bottom: 10px;">Muestra este QR al cajero</p>
+                        <img id="imgQR" src="" alt="QR Factura" style="width: 130px; height: 130px; border-radius: 8px;">
+                    </div>
+                    <button class="btn-3d" style="margin-top: 20px; width: 80%; background: #1A233A; border-color: var(--tertiary);" onclick="ocultarQR()">Volver a Mis Compras</button>
                 </div>
             </div>
-        </div>
 
-        <!-- Tarjeta de Producto 2 (Ejemplo adicional) -->
-        <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.3s;" 
-             onclick="mostrarQR('PED-AUD1', 'Audífonos Sony WH-1000XM5', '1.200.000')" 
-             onmouseover="this.style.borderColor='var(--tertiary)'" 
-             onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <span style="color: #00FF88; font-size: 11px; font-weight: bold;"><i class="ph-fill ph-check-circle"></i> Entregado el 10 Sep</span>
-                <span style="color: gray; font-size: 11px;">PED-AUD1</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px;">
-                    <i class="ph-duotone ph-headphones" style="font-size: 24px; color: white;"></i>
-                </div>
-                <div>
-                    <p style="font-size: 14px; font-weight: bold; margin: 0;">Audífonos Sony WH-1000XM5</p>
-                    <p style="font-size: 12px; color: #E0E0E0; margin: 0;">$1.200.000 COP</p>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- Botón Inferior -->
-    <button type="button" class="btn-3d z-1" style="background: rgba(255,77,77,0.2); border-color: #ff4d4d; color: #ff4d4d; box-shadow:none; margin-top: auto;" onclick="cerrarSesion()">Cerrar Sesión</button>
-
-    <!-- Modal Emergente para el QR (Oculto por defecto) -->
-    <div id="modalQR" class="z-3" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 16, 33, 0.95); backdrop-filter: blur(10px); flex-direction: column; justify-content: center; align-items: center; padding: 20px; border-radius: 35px; z-index: 100;">
-        <div style="background: white; padding: 20px; border-radius: 16px; text-align: center; color: black; width: 100%; max-width: 280px; box-shadow: 0 0 40px var(--tertiary);">
-            <h3 style="color: var(--tertiary); font-size: 16px; margin-top: 0; margin-bottom: 5px;">🛒 Factura de Devolución</h3>
-            <hr style="border: 0; border-top: 1px solid #eee; margin: 10px 0;">
-            <p style="font-size: 13px; margin: 3px 0;" id="modalPedido"><strong>Pedido:</strong> -</p>
-            <p style="font-size: 13px; margin: 3px 0;" id="modalArticulo"><strong>Artículo:</strong> -</p>
-            <p style="font-size: 13px; margin: 3px 0;" id="modalTotal"><strong>Total:</strong> -</p>
-            <hr style="border: 0; border-top: 1px solid #eee; margin: 10px 0;">
-            <p style="font-size: 11px; color: gray; margin-bottom: 10px;">Muestra este QR al cajero</p>
-            <img id="imgQR" src="" alt="QR Factura" style="width: 130px; height: 130px; border-radius: 8px;">
-        </div>
-        <button class="btn-3d" style="margin-top: 20px; width: 80%; background: #1A233A; border-color: var(--tertiary);" onclick="ocultarQR()">Volver a Mis Compras</button>
-    </div>
-</div>
-
-
-                <button type="button" class="btn-3d z-1" style="background: rgba(255,77,77,0.2); border-color: #ff4d4d; color: #ff4d4d; box-shadow:none;" onclick="cerrarSesion()">Cerrar Sesión</button>
-            </div>
-
-            
+            <!-- ================= VISTA CAJERO ================= -->
             <div id="vistaCajero" class="view hidden-left" style="--theme-color: var(--secondary);">
                 <h2 class="z-3" style="color: white; font-size: 22px;">Caja Principal <i class="ph-duotone ph-desktop"></i></h2>
                 <p class="sub z-2" style="margin-bottom: 10px;">Módulo Omnicanal de Devoluciones</p>
@@ -272,7 +254,10 @@
                     
                     <button type="button" class="btn-3d z-3" onclick="buscarPedido()">Buscar Pedido</button>
                     <p id="searchError" class="error-text z-2" style="display: none; margin-top: 15px; background: rgba(255, 77, 77, 0.1); padding: 10px; border-radius: 8px; border: 1px dashed #ff4d4d;"></p>
-    
+                    
+                    <button onclick="cerrarSesion()" style="margin-top: 15px; background-color: #3b2a3a; color: #ff6b6b; border: 1px solid #ff6b6b; padding: 12px; border-radius: 10px; width: 100%; font-weight: bold; cursor: pointer;">
+                        CERRAR SESIÓN
+                    </button>
                 </div>
 
                 <div id="orderDetails" style="display: none;">
@@ -301,7 +286,6 @@
                     <h2 class="z-2" style="color: white; font-size: 20px;">¡Devolución Exitosa!</h2>
                     <p class="z-2" style="color: #E0E0E0; font-size: 13px; margin-bottom: 12px;">ID Transacción: #<span id="transId"></span></p>
 
-                    
                     <div id="alertaInventario" class="z-2" style="display: none; background: rgba(0, 255, 136, 0.15); border: 1px dashed #00FF88; padding: 12px; border-radius: 12px; margin-bottom: 15px;">
                         <p style="color: #00FF88; font-size: 14px; font-weight: bold; margin-bottom: 4px;">📦 +1 Artículo devuelto</p>
                         <p style="color: #E0E0E0; font-size: 11px; margin: 0;">Sumado automáticamente al inventario de la tienda física (Dato Único sincronizado).</p>
@@ -309,12 +293,10 @@
                     
                     <button type="button" class="btn-3d z-3" style="background: #5B5F54;" onclick="reiniciarCaja()">Atender Otro</button>
                 </div>
+            </div>
 
-        </div>
-    </div>
-
-    
-    <script>
+        </div> <!-- CIERRE DEL PANEL HOLOGRÁFICO -->
+    </div> <!-- CIERRE DE LA ESCENA 3D -->
         const panel = document.getElementById('tiltPanel');
         let parallaxActivo = true;
 

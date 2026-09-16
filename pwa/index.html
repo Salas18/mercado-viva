@@ -198,9 +198,9 @@
             <!-- ================= VISTA CLIENTE ================= -->
             <div id="vistaCliente" class="view hidden-right" style="--theme-color: var(--tertiary); position: relative; overflow: hidden; justify-content: flex-start;">
 
-                <!-- Barra superior tipo Mercado Libre: logo + botón de perfil -->
+                
                 <div class="z-3" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; position: relative;">
-                    <i class="ph-duotone ph-storefront" style="font-size: 32px; color: var(--tertiary);"></i>
+                    <i class="ph-duotone ph-storefront" style="font-size: 32px; color: var(--tertiary); cursor: pointer;" onclick="irACatalogo()"></i>
 
                     <div style="position: relative;">
                         <button type="button" id="perfilBtn" class="profile-btn" onclick="toggleMenuPerfil(event)">
@@ -222,35 +222,34 @@
                     </div>
                 </div>
 
-                <!-- Pantalla de bienvenida (por defecto, antes de abrir Mis compras) -->
-                <div id="clienteHome" class="z-2" style="text-align: center; padding: 50px 10px;">
-                    <i class="ph-duotone ph-seal-check" style="font-size: 60px; color: var(--tertiary);"></i>
-                    <h2 style="color: white; font-size: 20px; margin-top: 14px;">Hola, Miguel</h2>
-                    <p class="sub" style="margin-top: 6px;">Toca tu perfil arriba para ver tus compras</p>
-                </div>
+                <!-- Pantalla de bienvenida (Dashboard VIP) -->
+                <div id="clienteHome" class="z-2" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 10px 5px; flex-grow: 1;">
+                    <i class="ph-fill ph-seal-check" style="font-size: 50px; color: var(--tertiary); margin-bottom: 5px;"></i>
+                    <h2 style="color: white; font-size: 22px; margin: 0;">Hola, Miguel</h2>
+                    <p style="font-size: 13px; color: #E0E0E0; margin: 5px 0 15px 0;">Bienvenido a tu panel de cliente</p>
 
-                <!-- Sección Mis compras (oculta hasta que se abre desde el menú) -->
-                <div id="misComprasSection" class="z-2" style="display: none; overflow-y: auto; flex-grow: 1; padding-right: 5px; margin-bottom: 15px;">
-                    <button type="button" onclick="ocultarMisCompras()" style="background: none; border: none; color: var(--tertiary); font-size: 13px; font-weight: 700; margin-bottom: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 0; font-family: var(--font);">
-                        <i class="ph-bold ph-arrow-left"></i> Mis compras
-                    </button>
-
-                    <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.3s;" 
-                         onclick="mostrarQR('PED-XBOX2', 'Mando Xbox Series X/S', '350.000')" onmouseover="this.style.borderColor='var(--tertiary)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            <span style="color: #00FF88; font-size: 11px; font-weight: bold;"><i class="ph-fill ph-check-circle"></i> Entregado hoy</span>
-                            <span style="color: gray; font-size: 11px;">PED-XBOX2</span>
+                    
+                    <div style="background: linear-gradient(135deg, rgba(255,0,127,0.2), rgba(176,38,255,0.1)); border: 1px solid var(--tertiary); border-radius: 16px; padding: 15px; text-align: left; width: 100%; margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); position: relative; overflow: hidden;">
+                        <div style="position: relative; z-index: 2;">
+                            <h3 style="color: white; font-size: 15px; margin: 0 0 5px 0;">🎮 20% OFF en Gaming</h3>
+                            <p style="font-size: 11px; color: #ddd; margin: 0 0 10px 0;">Aprovecha tu descuento de Cliente Oro.</p>
+                            <button type="button" class="btn-3d" style="padding: 6px 12px; font-size: 10px; width: auto; background: var(--tertiary);" onclick="irACatalogo()">Ir al Catálogo</button>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px;">
-                                <i class="ph-duotone ph-game-controller" style="font-size: 24px; color: white;"></i>
-                            </div>
-                            <div>
-                                <p style="font-size: 14px; font-weight: bold; margin: 0;">Mando Xbox Series X/S</p>
-                                <p style="font-size: 12px; color: #E0E0E0; margin: 0;">$350.000 COP</p>
-                            </div>
+                        <i class="ph-duotone ph-game-controller" style="position: absolute; right: -15px; bottom: -15px; font-size: 90px; color: rgba(255,255,255,0.05); z-index: 1;"></i>
+                    </div>
+
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%;">
+                        <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 15px; cursor: pointer; transition: 0.3s;" onmouseover="this.style.borderColor='var(--tertiary)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'" onclick="mostrarMisCompras()">
+                            <i class="ph-duotone ph-shopping-bag" style="font-size: 28px; color: var(--tertiary); margin-bottom: 5px;"></i>
+                            <p style="font-size: 12px; font-weight: bold; margin: 0; color: white;">Mis Compras</p>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 15px; cursor: pointer; transition: 0.3s;" onmouseover="this.style.borderColor='#00F0FF'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'" onclick="alert('Redirigiendo a chat con soporte técnico...')">
+                            <i class="ph-duotone ph-headset" style="font-size: 28px; color: #00F0FF; margin-bottom: 5px;"></i>
+                            <p style="font-size: 12px; font-weight: bold; margin: 0; color: white;">Soporte</p>
                         </div>
                     </div>
+                </div>
 
                     <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.3s;" 
                          onclick="mostrarQR('PED-AUD1', 'Audífonos Sony WH-1000XM5', '1.200.000')" onmouseover="this.style.borderColor='var(--tertiary)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'">
@@ -681,6 +680,10 @@ document.addEventListener('click', (e) => {
         cerrarMenuPerfil();
     }
 });
+
+function irACatalogo() {
+    alert('🚀 Módulo de Catálogo 3D en construcción.\n\nEsta función conectará el perfil del cliente con la tienda principal en la próxima fase del proyecto.');
+}
     </script>
 </body>
 </html>

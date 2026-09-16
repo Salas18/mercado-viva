@@ -135,10 +135,10 @@
         .profile-btn:hover { background: rgba(255,255,255,0.18); border-color: var(--tertiary); }
 
         .profile-menu {
-            display: none; position: absolute; top: 56px; right: 0; width: 230px;
+            display: none; position: fixed; width: 230px;
             background: rgba(15, 20, 38, 0.98); backdrop-filter: blur(14px);
             border: 1px solid rgba(255,255,255,0.15); border-radius: 14px;
-            padding: 8px; box-shadow: 0 15px 40px rgba(0,0,0,0.55); z-index: 50;
+            padding: 8px; box-shadow: 0 15px 40px rgba(0,0,0,0.55); z-index: 9999;
         }
 
         .profile-menu-item {
@@ -196,14 +196,14 @@
             </div>
 
             <!-- ================= VISTA CLIENTE ================= -->
-            <div id="vistaCliente" class="view hidden-right" style="--theme-color: var(--tertiary); position: relative; overflow: hidden;">
+            <div id="vistaCliente" class="view hidden-right" style="--theme-color: var(--tertiary); position: relative; overflow: hidden; justify-content: flex-start;">
 
                 <!-- Barra superior tipo Mercado Libre: logo + botón de perfil -->
                 <div class="z-3" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; position: relative;">
                     <i class="ph-duotone ph-storefront" style="font-size: 32px; color: var(--tertiary);"></i>
 
                     <div style="position: relative;">
-                        <button type="button" class="profile-btn" onclick="toggleMenuPerfil(event)">
+                        <button type="button" id="perfilBtn" class="profile-btn" onclick="toggleMenuPerfil(event)">
                             <i class="ph-fill ph-user-circle" style="font-size: 26px; color: var(--tertiary);"></i>
                         </button>
 
@@ -462,7 +462,7 @@
     { facingMode: "environment" }, 
     { fps: 10 },
     (decodedText) => {
-        // Se ejecuta cuando lee el QR con éxito
+        
         motorEscaner.stop().then(() => {
             document.getElementById('reader').style.display = "none";
             document.getElementById('orderId').value = decodedText;
@@ -627,20 +627,40 @@ function mostrarQR(pedido, articulo, total) {
 }
 
 function ocultarQR() {
-    // Oculta el panel superpuesto para volver a la lista
+  
     document.getElementById('modalQR').style.display = 'none';
 }
 
-/* ---------- Menú de perfil (vista cliente) ---------- */
+document.body.appendChild(document.getElementById('menuPerfil'));
+
+function posicionarMenuPerfil() {
+    const btn = document.getElementById('perfilBtn');
+    const menu = document.getElementById('menuPerfil');
+    const rect = btn.getBoundingClientRect();
+    menu.style.top = (rect.bottom + 10) + 'px';
+    menu.style.left = (rect.right - menu.offsetWidth) + 'px';
+}
 
 function toggleMenuPerfil(event) {
     if (event) event.stopPropagation();
     const menu = document.getElementById('menuPerfil');
-    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    const abriendo = menu.style.display !== 'block';
+
+    if (abriendo) {
+        menu.style.display = 'block';
+        posicionarMenuPerfil();
+        
+        parallaxActivo = false;
+        panel.style.transform = `rotateY(0deg) rotateX(0deg)`;
+    } else {
+        menu.style.display = 'none';
+        parallaxActivo = true;
+    }
 }
 
 function cerrarMenuPerfil() {
     document.getElementById('menuPerfil').style.display = 'none';
+    parallaxActivo = true;
 }
 
 function mostrarMisCompras() {
@@ -654,7 +674,7 @@ function ocultarMisCompras() {
     document.getElementById('clienteHome').style.display = 'block';
 }
 
-// Cierra el menú de perfil si el usuario hace clic afuera de él
+
 document.addEventListener('click', (e) => {
     const menu = document.getElementById('menuPerfil');
     if (menu && menu.style.display === 'block' && !menu.contains(e.target)) {
